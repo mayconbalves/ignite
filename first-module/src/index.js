@@ -1,37 +1,48 @@
+const { response } = require('express')
 const express = require('express')
 const { v4: uuidV4 } = require('uuid')
 
 const app = express()
 app.use(express.json())
 
-const costumers = []
+const customer = []
 
-app.post('/account', (req, res) => {
-  const { cpf, name } = req.body
+function verifyExistsAccountCpf(request, response, next) {
+  const { cpf } = request.headers
 
-  const costumersAlreadyExiste = costumers.some(
-    costumer => costumer.cpf === cpf
-  )
-
-  if(costumersAlreadyExiste) {
-    return res.status(400).json({ error: 'costumer already existe' })
+  const costumer = customer.find(costumer => costumer.cpf === cpf)
+  if (!costumer) {
+    return response.status(400).json({ error: 'Costumer not found' })
   }
 
-  costumers.push({
+  request.customer = costumer
+  return next()
+}
+
+app.post('/account', (request, response) => {
+  const { cpf, name } = request.body
+
+  const customerAlreadyExiste = customer.some(
+    customer => customer.cpf === cpf
+  )
+
+  if(customerAlreadyExiste) {
+    return response.status(400).json({ error: 'customer already existe' })
+  }
+
+  customer.push({
     cpf,
     name,
     id: uuidV4(),
     statement: []
   })
 
-  return res.status(201).send()
+  return response.status(201).send()
 })
 
-app.get('/statement/:cpf', (req, res) => {
-  const { cpf } = req.params
-
-  const costumer = costumers.find(costumer => costumer.cpf === cpf)
-  return res.json(costumer.statement)
+app.get('/statement', verifyExistsAccountCpf, (request, response) => {
+  const { customer } = request
+  return response.json(customer.statement)
 })
 
 app.listen(3333)
