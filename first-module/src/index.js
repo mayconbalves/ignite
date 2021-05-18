@@ -1,4 +1,4 @@
-const { response } = require('express')
+const { response, request } = require('express')
 const express = require('express')
 const { v4: uuidV4 } = require('uuid')
 
@@ -108,9 +108,22 @@ app.get('/statement/date', verifyExistsAccountCpf, (request, response) => {
     }
   )
 
-  console.log(statement, 'statement')
-
   return response.json(statement)
+})
+
+app.put('/account', verifyExistsAccountCpf, (request, response) => {
+  const { name } = request.body
+  const { customer } = request
+
+  customer.name = name
+  
+  return response.status(201).send()
+})
+
+app.get('/account', verifyExistsAccountCpf, (request, response) => {
+  const { customer } = request
+
+  return response.json(customer)
 })
 
 app.listen(3333)
