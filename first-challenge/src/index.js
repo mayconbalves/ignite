@@ -9,16 +9,24 @@ app.use(cors())
 const users = []
 
 app.post('/users', (request, response) => {
-  const { name, userName } = request.body
+  const { name, username } = request.body
 
-  const fullUser = {
+  users.push({
     id: uuidV4(),
     name,
-    userName,
+    username,
     todos: []
-  }
+  })
 
-  return response.status(201).json(fullUser)
+  return response.status(201).json(users)
+})
+
+app.get('/todos', (request, response) => {
+  const { username } = request.headers
+
+  const userTodos = users.find((user) => user.username === username)
+
+  return response.status(200).json(userTodos.todos)
 })
 
 app.listen(3333)
