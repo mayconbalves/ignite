@@ -29,5 +29,22 @@ app.get('/todos', (request, response) => {
   return response.status(200).json(userTodos.todos)
 })
 
+app.post('/todos', (request, response) => {
+  const { title, deadline } = request.body
+  const { username } = request.headers
+
+  const userTodos = users.find((user) => user.username === username)
+
+  userTodos.todos.push({
+    id: uuidV4(),
+    title,
+    done: false,
+    deadline: new Date(deadline),
+    created_at: new Date()
+  })
+
+  return response.status(201).json(userTodos)
+})
+
 app.listen(3333)
 
