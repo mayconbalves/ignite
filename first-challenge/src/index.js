@@ -8,6 +8,20 @@ app.use(cors())
 
 const users = []
 
+function checkExistsUser(request, response, next) {
+  const { username } = request.headers
+
+  const user = users.find((user) => user.username === username)
+
+  if(!user) {
+    return response.status(404).json({ error: 'User not found' })
+  }
+
+  request.user = user
+
+  return next()
+}
+
 app.post('/users', (request, response) => {
   const { name, username } = request.body
 
