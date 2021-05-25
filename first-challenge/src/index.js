@@ -11,14 +11,22 @@ const users = []
 app.post('/users', (request, response) => {
   const { name, username } = request.body
 
-  users.push({
+  const userExists = users.find((user) => user.username === username)
+
+  if (userExists) {
+    return response.status(400).json({ error: 'User already exists' })
+  }
+
+  const user = {
     id: uuidV4(),
     name,
     username,
     todos: []
-  })
+  }
 
-  return response.status(201).json(users)
+  users.push(user)
+
+  return response.status(201).json(user)
 })
 
 app.get('/todos', (request, response) => {
