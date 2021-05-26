@@ -43,29 +43,34 @@ app.post('/users', (request, response) => {
   return response.status(201).json(user)
 })
 
-app.get('/todos', (request, response) => {
-  const { username } = request.headers
+app.get('/todos', checkExistsUser, (request, response) => {
+  const { user } = request
 
-  const userTodos = users.find((user) => user.username === username)
-
-  return response.status(200).json(userTodos.todos)
+  return response.status(200).json(user.todos)
 })
 
-app.post('/todos', (request, response) => {
+app.post('/todos', checkExistsUser, (request, response) => {
   const { title, deadline } = request.body
-  const { username } = request.headers
+  const { user } = headers
 
-  const userTodos = users.find((user) => user.username === username)
-
-  userTodos.todos.push({
+  const todo = {
     id: uuidV4(),
     title,
     done: false,
     deadline: new Date(deadline),
     created_at: new Date()
-  })
+  }
 
-  return response.status(201).json(userTodos)
+  user.todos.push(todo)
+
+  return response.status(201).json(todo)
+})
+
+app.put('/todos/:id', (request, response) => {
+  const { title, deadline } = request.body
+  const { username } = request.headers
+
+  const userId = users.find((user) => user.username === username)
 })
 
 app.listen(3333)
