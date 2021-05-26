@@ -66,11 +66,16 @@ app.post('/todos', checkExistsUser, (request, response) => {
   return response.status(201).json(todo)
 })
 
-app.put('/todos/:id', (request, response) => {
+app.put('/todos/:id', checkExistsUser, (request, response) => {
   const { title, deadline } = request.body
-  const { username } = request.headers
+  const { user } = headers
+  const { id } = request.params
 
-  const userId = users.find((user) => user.username === username)
+  const todo = user.todos.find((todo) => todo.id === id)
+  todo.title = title
+  todo.deadline = new Date(deadline)
+
+  return response.json(todo)
 })
 
 app.listen(3333)
