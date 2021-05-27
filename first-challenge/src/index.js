@@ -89,9 +89,28 @@ app.patch('/todos/:id/done', checkExistsUser, (request, response) => {
 
   const todo = user.todos.find((todo) => todo.id === id)
 
+  if (!todo) {
+    return response.status(400).json({ error: 'Todo not exists' })
+  }
+
   todo.done = true
 
   return response.json(todo)
+})
+
+app.delete('/delete/:id', checkExistsUser, (request, response) => {
+  const { user } = headers
+  const { id } = request.params
+
+  const todoIndex = user.todos.findIndex((todo) => todo.id === id)
+
+  if (todoIndex === -1) {
+    return response.status(400).json({ error: 'Todo not exists' })
+  }
+
+  user.todos.splice(todoIndex, 1)
+
+  return response.status(204).send()
 })
 
 app.listen(3333)
