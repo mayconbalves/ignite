@@ -83,5 +83,16 @@ app.put('/todos/:id', checkExistsUser, (request, response) => {
   return response.json(todo)
 })
 
+app.patch('/todos/:id/done', checkExistsUser, (request, response) => {
+  const { user } = headers
+  const { id } = request.params
+
+  const todo = user.todos.find((todo) => todo.id === id)
+
+  todo.done = true
+
+  return response.json(todo)
+})
+
 app.listen(3333)
 
